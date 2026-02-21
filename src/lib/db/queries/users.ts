@@ -1,5 +1,5 @@
 import {db} from "..";
-import { users } from "../schema";
+import { feedFollows, feeds, users } from "../schema";
 import { eq } from "drizzle-orm";
 
 
@@ -25,4 +25,10 @@ export async function deleteUsers() {
 
 export async function getUsers() {
     return await db.select().from(users);
+}
+
+
+export async function getFeedFollowsForUser(userId: string) {
+    const result = await db.select().from(users).innerJoin(feedFollows, eq(users.id, feedFollows.userId)).innerJoin(feeds, eq(feedFollows.feedId, feeds.id)).where(eq(users.id, userId));
+    return result;
 }

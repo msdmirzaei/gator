@@ -15,6 +15,13 @@
       "when": 1771545315953,
       "tag": "0001_famous_mariko_yashida",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1771702652941,
+      "tag": "0002_busy_wild_child",
+      "breakpoints": true
     }
   ]
 }
