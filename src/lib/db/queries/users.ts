@@ -13,6 +13,11 @@ export async function getUser(name: string) {
     return result[0];
 }
 
+export async function getUserById(id: string) {
+    const result = await db.select().from(users).where(eq(users.id, id));
+    return result[0];
+}
+
 export async function deleteUsers() {
     const result = await db.delete(users);
     return result
