@@ -23,17 +23,13 @@ cd gator
 npm install
 ```
 
-3. start the project:
-```bash
-npm run start
-```
 
 ## Usage
 
 Run commands using:
 
 ```bash
-node dist/index.js <command> [arguments]
+npm run start <command> [arguments]
 ```
 
 ## Commands
