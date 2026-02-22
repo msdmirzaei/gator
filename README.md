@@ -14,8 +14,8 @@ A command-line blog aggregator built as part of the Boot.dev curriculum. This to
 
 1. Clone the repository:
 ```bash
-git clone <your-repo-url>
-cd <your-repo-name>
+git clone https://github.com/msdmirzaei/gator
+cd gator
 ```
 
 2. Install dependencies:
