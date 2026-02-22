@@ -11,6 +11,7 @@ import { handlerFollow } from "./follow_handler.js";
 import { handlerFollowing } from "./following_handler.js";
 import { middlewareLoggedIn } from "./middleware.js";
 import { handlerUnfollow } from "./unfollow_handler.js";
+import { handlerBrowse } from "./browse_handler.js";
 
 async function main() {
    
@@ -41,7 +42,12 @@ async function main() {
         commandRegistry,
         "unfollow",
         middlewareLoggedIn(handlerUnfollow)
-    )
+    );
+    registerCommand(
+        commandRegistry,
+        "browse",
+        middlewareLoggedIn(handlerBrowse)
+    );
     
 
     if(process.argv.length < 3) {

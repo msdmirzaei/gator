@@ -1,19 +1,21 @@
 import { XMLParser } from "fast-xml-parser";
+import { getNextFeedToFetch, markFeedFetched } from "./lib/db/queries/feeds";
+import { createPost } from "./lib/db/queries/posts";
 
 export type RSSFeed = {
-  channel: {
-    title: string;
-    link: string;
-    description: string;
-    item: RSSItem[];
-  };
+    channel: {
+        title: string;
+        link: string;
+        description: string;
+        item: RSSItem[];
+    };
 };
 
 export type RSSItem = {
-  title: string;
-  link: string;
-  description: string;
-  pubDate: string;
+    title: string;
+    link: string;
+    description: string;
+    pubDate: string;
 };
 
 export async function fetchFeed(feedURL: string): Promise<RSSFeed> {
@@ -27,10 +29,10 @@ export async function fetchFeed(feedURL: string): Promise<RSSFeed> {
     const parser = new XMLParser();
     const rawRss = parser.parse(XMLString);
 
-    if(!rawRss.rss.channel) {
+    if (!rawRss.rss.channel) {
         throw new Error("response doesn't have channel field");
     }
-    if(!rawRss.rss.channel.title || !rawRss.rss.channel.link || !rawRss.rss.channel.description) {
+    if (!rawRss.rss.channel.title || !rawRss.rss.channel.link || !rawRss.rss.channel.description) {
         throw new Error("metadata is not present");
     }
 
@@ -40,22 +42,22 @@ export async function fetchFeed(feedURL: string): Promise<RSSFeed> {
 
     let items = [];
 
-    if(rawRss.rss.channel.item){
-        if(Array.isArray(rawRss.rss.channel.item)) {
-            for(const item of rawRss.rss.channel.item) {
-                if(!item.title || !item.link || !item.description || !item.pubDate) {
+    if (rawRss.rss.channel.item) {
+        if (Array.isArray(rawRss.rss.channel.item)) {
+            for (const item of rawRss.rss.channel.item) {
+                if (!item.title || !item.link || !item.description || !item.pubDate) {
                     continue;
                 }
                 items.push(item);
             }
         } else {
             const item = rawRss.rss.channel.item;
-            if(item.title && item.link && item.description && item.pubDate) {
+            if (item.title && item.link && item.description && item.pubDate) {
                 items.push(item);
             }
         }
     }
-    
+
     return {
         channel: {
             title: title,
@@ -63,6 +65,26 @@ export async function fetchFeed(feedURL: string): Promise<RSSFeed> {
             description: description,
             item: items
         }
+    }
+
+}
+
+
+
+export async function scrapeFeeds() {
+    const feed = await getNextFeedToFetch();
+    await markFeedFetched(feed.id);
+    const fetchedFeed = await fetchFeed(feed.url);
+    for (const item of fetchedFeed.channel.item) {
+        const publishedAt = new Date(item.pubDate);
+
+        await createPost({
+            title: item.title,
+            url: item.link,
+            description: item.description,
+            publishedAt: isNaN(publishedAt.getTime()) ? null : publishedAt,
+            feedId: feed.id,
+        });
     }
 
 }
